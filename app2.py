@@ -5,22 +5,28 @@ import os
 from datetime import date
 
 # -----------------------------------------------------------------------------
-# 1. 系統設定與資料庫初始化 (本地 JSON 存檔)
+# 1. 系統設定與資料庫初始化 (自動儲存至本地端 JSON 檔案)
 # -----------------------------------------------------------------------------
-st.set_page_config(page_title="My Life OS", page_icon="🌌", layout="wide")
+st.set_page_config(page_title="一年重塑計畫", page_icon="🎯", layout="wide")
 
-DATA_FILE = "life_os_data.json"
-TODAY = str(date.today())
+DATA_FILE = "dan_koe_life_data.json"
 
-# 預設資料 (包含你的具體執行任務)
+# 初始化繁體中文的預設資料架構
 DEFAULT_DATA = {
-    "vision": "我是那種會將火災預測模型推進到精準的「空間危害排序」的人；也是那種願意籌劃長途自駕遠行的實踐者。",
-    "habits": [
-        {"領域": "學術", "具體行動": "調整 GCN-TCAN 模型，精化「住宅」多房間佈局的危險度分級", "目標": "120 分鐘", "今日實際": "", "完成": False},
-        {"領域": "專案", "具體行動": "覆核市政採購公文 (確認工程管理費率套用 1.0% 標準)", "目標": "1 份", "今日實際": "", "完成": False},
-        {"領域": "探索", "具體行動": "推進 10 月絲路自駕 (西安至烏魯木齊) 準備：確認 eHi 租車與秋季路況", "目標": "1 項", "今日實際": "", "完成": False}
+    "anti_vision": "每天渾渾噩噩、專業技能停滯不前；在 5 年後還拿著差不多的薪水，身體肥胖、缺乏精力，每天醒來都感到焦慮與後悔。",
+    "week_focus": "本週核心：攻克論文關鍵數據，同時精準覆核局內重要工程預算。",
+    "top_priorities": [
+        "調整 GCN-TCAN 空間特徵萃取模型，精化住宅佈局的危險度分級",
+        "覆核防災中心電梯汰換工程公文 (確認工程管理費率套用 1.0%)",
+        "推進 10 月絲路 16 天自駕自駕與行程細節 (確認 eHi 租車與秋季路況)"
     ],
-    "journals": {} # 儲存每日日記的字典
+    "time_blocks": [
+        {"時間區塊": "07:00 - 09:00", "核心領域": "🔥 深度工作", "具體任務 / 預期產出": "執行火災模擬與 GCN-TCAN 數據跑組", "狀態": "未開始"},
+        {"時間區塊": "09:00 - 10:00", "核心領域": "☕ 緩衝時間", "具體任務 / 預期產出": "盥洗、早餐、切換思維狀態", "狀態": "未開始"},
+        {"時間區塊": "10:00 - 12:00", "核心領域": "💼 淺度工作", "具體任務 / 預期產出": "處理局內防災中心公文與行政庶備", "狀態": "未開始"},
+        {"時間區塊": "13:00 - 14:00", "核心領域": "🗺️ 探索規劃", "具體任務 / 預期產出": "確認絲路自駕（西安到烏魯木齊）路況與還車方案", "狀態": "未開始"},
+        {"時間區塊": "14:00 以後", "核心領域": "⏳ 自由支配", "具體任務 / 預期產出": "維持日常規律、健身、閱讀、檢視美股 AI 電力基礎建設走勢", "狀態": "未開始"}
+    ]
 }
 
 def load_data():
@@ -35,72 +41,76 @@ def save_data(data):
 
 data = load_data()
 
-# 確保今天的日記欄位存在
-if TODAY not in data["journals"]:
-    data["journals"][TODAY] = {"morning": "", "evening": ""}
-
 # -----------------------------------------------------------------------------
-# 2. 介面設計：Notion 風格的多頁籤系統
+# 2. 網頁視覺與響應式介面設計 (RWD 繁體中文版)
 # -----------------------------------------------------------------------------
-st.title("🌌 系統化個人作業系統 (Life OS)")
-st.markdown("將大腦的混亂外包給系統，把精力留給執行。")
+st.title("🎯 1 年人生重塑系統 (Life Architect)")
+st.markdown(f"基於 Dan Koe 經典框架 · 今天是 `{date.today()}`")
 st.divider()
 
-# 建立三個分頁
-tab1, tab2, tab3 = st.tabs(["✅ 每日量化打卡", "📔 晨晚間復盤", "🎯 核心願景設定"])
+# RWD 兩欄佈局：左邊是願景引導，右邊是今日行動
+col1, col2 = st.columns([1, 2])
 
-# ==========================================
-# 分頁 1：每日量化打卡 (Habit Tracker)
-# ==========================================
-with tab1:
-    st.subheader("今日執行矩陣")
-    df_habits = pd.DataFrame(data["habits"])
+with col1:
+    st.subheader("🛑 階段一：反向願景 (Anti-Vision)")
+    st.caption("提醒自己：如果今天偷懶，一年後絕對不想過上什麼樣的痛苦生活？")
+    new_anti_vision = st.text_area("寫下你最討厭的現狀與盲點：", value=data["anti_vision"], height=140, key="av_input")
+    
+    st.divider()
+    
+    st.subheader("📅 本週核心焦點")
+    new_week_focus = st.text_input("這一週的破局關鍵事實：", value=data["week_focus"], key="wf_input")
+    
+    st.markdown("#### 🚀 今日最重要的 3 件高槓桿任務")
+    p1 = st.text_input("1. 最高優先 (學術/核心技能)", value=data["top_priorities"][0])
+    p2 = st.text_input("2. 次要優先 (專案/當前業務)", value=data["top_priorities"][1])
+    p3 = st.text_input("3. 維護優先 (自我實現/探索)", value=data["top_priorities"][2])
+    
+    new_priorities = [p1, p2, p3]
+
+with col2:
+    st.subheader("⚡ 階段二：時間區塊防守矩陣 (Time-Blocking)")
+    st.markdown("不用填滿每一分鐘，而是確保神聖的 **深度工作時間** 不被任何人打擾。")
+    st.caption("💡 技巧：您可以直接點擊下方表格內的任何格子進行「修改任務」或「切換狀態」。")
+    
+    # 轉換成 DataFrame 供 Data Editor 編輯
+    df_blocks = pd.DataFrame(data["time_blocks"])
     
     edited_df = st.data_editor(
-        df_habits,
+        df_blocks,
         use_container_width=True,
-        num_rows="dynamic",
+        num_rows="dynamic", # 允許自由增減時間區塊
         column_config={
-            "完成": st.column_config.CheckboxColumn("完成", default=False)
+            "時間區塊": st.column_config.TextColumn("⏰ 時間範圍", width="small", help="例如：07:00 - 09:00"),
+            "核心領域": st.column_config.SelectboxColumn(
+                "🎯 領域類別",
+                options=["🔥 深度工作", "💼 淺度工作", "☕ 緩衝時間", "🗺️ 探索規劃", "⏳ 自由支配"],
+                width="small"
+            ),
+            "具體任務 / 預期產出": st.column_config.TextColumn("📝 具體任務 / 預期產出", width="large"),
+            "狀態": st.column_config.SelectboxColumn(
+                "📌 狀態",
+                options=["未開始", "執行中 ⚡", "已完成 ✅", "已順延 ☕"],
+                width="small"
+            )
         },
         hide_index=True
     )
-    
-    # 檢查並儲存變更
-    updated_habits = edited_df.to_dict(orient="records")
-    if updated_habits != data["habits"]:
-        data["habits"] = updated_habits
-        save_data(data)
 
-# ==========================================
-# 分頁 2：晨晚間復盤 (Daily Journal)
-# ==========================================
-with tab2:
-    st.subheader(f"📅 今日復盤 ({TODAY})")
-    
-    st.markdown("#### 🌅 晨間意圖 (Morning Intention)")
-    morning_text = st.text_area("今天最重要的一件事是什麼？我今天要避開什麼干擾？", 
-                                value=data["journals"][TODAY]["morning"], height=100)
-    
-    st.markdown("#### 🌙 晚間反思 (Evening Review)")
-    evening_text = st.text_area("今天學到了什麼？有哪些進度？明天可以如何優化？", 
-                                value=data["journals"][TODAY]["evening"], height=150)
-    
-    # 檢查並儲存日記
-    if morning_text != data["journals"][TODAY]["morning"] or evening_text != data["journals"][TODAY]["evening"]:
-        data["journals"][TODAY]["morning"] = morning_text
-        data["journals"][TODAY]["evening"] = evening_text
-        save_data(data)
+# -----------------------------------------------------------------------------
+# 3. 自動偵測變更與儲存機制
+# -----------------------------------------------------------------------------
+updated_blocks = edited_df.to_dict(orient="records")
 
-# ==========================================
-# 分頁 3：核心願景設定 (Vision Board)
-# ==========================================
-with tab3:
-    st.subheader("身份重塑與一年目標")
-    new_vision = st.text_area("宣告你的新身份與願景", value=data["vision"], height=150)
+if (new_anti_vision != data["anti_vision"] or 
+    new_week_focus != data["week_focus"] or 
+    new_priorities != data["top_priorities"] or 
+    updated_blocks != data["time_blocks"]):
     
-    if new_vision != data["vision"]:
-        data["vision"] = new_vision
-        save_data(data)
-
-st.caption("所有變更皆會自動儲存。")
+    data["anti_vision"] = new_anti_vision
+    data["week_focus"] = new_week_focus
+    data["top_priorities"] = new_priorities
+    data["time_blocks"] = updated_blocks
+    
+    save_data(data)
+    st.toast("系統已自動同步變更！", icon="💾")
