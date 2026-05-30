@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1-Year Life Fix Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        textarea { resize: none; }
+        /* 隱藏捲軸但保留滾動功能 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12">
+
+    <header class="mb-10 text-center md:text-left">
+        <h1 class="text-3xl font-bold tracking-wider text-slate-100">SYSTEM <span class="text-blue-500">ONE</span></h1>
+        <p class="text-slate-400 mt-2">How To Fix Your Entire Life In 1 Year</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+
+        <!-- Phase 1: The Purge -->
+        <div class="glass-panel p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl font-semibold text-blue-400 mb-4 border-b border-slate-600 pb-2">Phase 1: 覺醒與斷捨離</h2>
+            <label class="block text-sm text-slate-400 mb-2">大腦排毒 (Brain Dump) - 寫下所有焦慮與雜念</label>
+            <textarea id="brainDump" class="w-full h-32 bg-slate-800 text-slate-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="現在腦子裡在煩惱什麼...？"></textarea>
+            
+            <label class="block text-sm text-slate-400 mt-4 mb-2">本週必須戒除的「時間小偷」</label>
+            <input type="text" id="timeThief" class="w-full bg-slate-800 text-slate-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：睡前無意義滑手機 1 小時">
+        </div>
+
+        <!-- Phase 2: The Anti-Vision -->
+        <div class="glass-panel p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl font-semibold text-red-400 mb-4 border-b border-slate-600 pb-2">Phase 2: 反向願景 (Anti-Vision)</h2>
+            <label class="block text-sm text-slate-400 mb-2">我絕對「不想」成為的人 / 過的生活</label>
+            <textarea id="antiVision" class="w-full h-32 bg-slate-800 text-slate-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="一年後，如果我什麼都沒改變，最糟糕的狀況是..."></textarea>
+            
+            <label class="block text-sm text-slate-400 mt-4 mb-2">為了避開上述情況，我的一年核心目標</label>
+            <input type="text" id="coreGoal" class="w-full bg-slate-800 text-slate-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="例如：順利完成學位並建立穩定的自動化現金流">
+        </div>
+
+        <!-- Phase 3: Focus & Routine -->
+        <div class="glass-panel p-6 rounded-xl shadow-lg md:col-span-2 lg:col-span-1">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 border-b border-slate-600 pb-2">Phase 3: 深度工作與常規 (每日 4 小時)</h2>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="newTask" class="flex-1 bg-slate-800 text-slate-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="新增今日深度工作任務...">
+                <button onclick="addTask()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded transition font-bold">加入</button>
+            </div>
+            <ul id="taskList" class="space-y-3">
+                <!-- 預設範例，可自行刪除 -->
+                <li class="flex items-center gap-3 bg-slate-800 p-3 rounded cursor-pointer hover:bg-slate-700 transition" onclick="this.classList.toggle('line-through'); this.classList.toggle('text-slate-500'); saveTasks();">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span> [學業] 調整 GCN-TCAN 空間特徵萃取模型，聚焦住宅多房間配置的危險度分級
+                </li>
+                <li class="flex items-center gap-3 bg-slate-800 p-3 rounded cursor-pointer hover:bg-slate-700 transition" onclick="this.classList.toggle('line-through'); this.classList.toggle('text-slate-500'); saveTasks();">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span> [工作] 撰寫防災中心電梯汰換工程採購公文 (確認工程管理費率為 1.0%)
+                </li>
+                <li class="flex items-center gap-3 bg-slate-800 p-3 rounded cursor-pointer hover:bg-slate-700 transition" onclick="this.classList.toggle('line-through'); this.classList.toggle('text-slate-500'); saveTasks();">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span> [個人] 推進 10 月絲路自駕行程細節 (確認 eHi 租車與秋季路況)
+                </li>
+            </ul>
+        </div>
+
+        <!-- Phase 4: Leverage -->
+        <div class="glass-panel p-6 rounded-xl shadow-lg md:col-span-2 lg:col-span-1">
+            <h2 class="text-xl font-semibold text-purple-400 mb-4 border-b border-slate-600 pb-2">Phase 4: 個人槓桿與輸出</h2>
+            <label class="block text-sm text-slate-400 mb-2">今日學到的經驗，如何轉化為系統或分享給他人？</label>
+            <textarea id="leverageIdea" class="w-full h-full min-h-[200px] bg-slate-800 text-slate-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例如：將繁瑣的預算編列過程，做成一個標準化的 Excel 模板，或者寫成一篇經驗分享文..."></textarea>
+        </div>
+
+    </div>
+
+    <script>
+        // 自動儲存與讀取資料的邏輯
+        const inputs = ['brainDump', 'timeThief', 'antiVision', 'coreGoal', 'leverageIdea'];
+        
+        // 頁面載入時讀取 LocalStorage
+        window.onload = () => {
+            inputs.forEach(id => {
+                const saved = localStorage.getItem(id);
+                if (saved) document.getElementById(id).value = saved;
+            });
+            const savedTasks = localStorage.getItem('tasks');
+            if (savedTasks) document.getElementById('taskList').innerHTML = savedTasks;
+        };
+
+        // 監聽所有輸入框，有變動就自動儲存
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                localStorage.setItem(id, e.target.value);
+            });
+        });
+
+        // 新增任務
+        function addTask() {
+            const input = document.getElementById('newTask');
+            if (input.value.trim() === '') return;
+            
+            const ul = document.getElementById('taskList');
+            const li = document.createElement('li');
+            li.className = "flex items-center gap-3 bg-slate-800 p-3 rounded cursor-pointer hover:bg-slate-700 transition";
+            li.innerHTML = `<span class="w-3 h-3 rounded-full bg-emerald-500"></span> ${input.value}`;
+            li.onclick = function() {
+                this.classList.toggle('line-through');
+                this.classList.toggle('text-slate-500');
+                saveTasks();
+            };
+            
+            ul.appendChild(li);
+            input.value = '';
+            saveTasks();
+        }
+
+        // 儲存任務清單的 HTML
+        function saveTasks() {
+            localStorage.setItem('tasks', document.getElementById('taskList').innerHTML);
+        }
+
+        // 按 Enter 鍵快速新增任務
+        document.getElementById('newTask').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+</body>
+</html>
