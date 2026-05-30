@@ -7,30 +7,58 @@ from datetime import date
 # -----------------------------------------------------------------------------
 # 1. 系統設定與資料庫初始化 (自動儲存至本地端 JSON 檔案)
 # -----------------------------------------------------------------------------
-st.set_page_config(page_title="1天重塑人生計畫", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="1天重塑人生計畫", page_icon="✨", layout="wide")
 
-DATA_FILE = "dan_koe_full_template.json"
+DATA_FILE = "dan_koe_1day_reset.json"
 
-# 萬全還原 Dan Koe Notion 模版的五大核心區塊
+# 初始化完整的預設資料架構 (完全對應 Dan Koe 模版)
 DEFAULT_DATA = {
-    "anti_vision": "寫下你絕對不想成為的人...\n(例如：身體肥胖、毫無專業累積、每天醒來都在為預算與時間感到無力與焦虑。)",
-    "ideal_vision": "寫下你渴望過上的生活...\n(例如：自由掌控清晨的 4 小時深度工作，將硬核技術轉化為個人槓桿，每年能安排一場極致的自駕探索。) ",
-    "one_year_goals": [
-        {"核心領域": "🚀 學術與技能", "目標描述": "完成 GCN-TCAN 模型優化與論文，聚焦住宅佈局危險度分級", "預計破局時程": "12 個月內"},
-        {"核心領域": "💼 專案與事業", "目標描述": "精準控管局內工程進度與預算編列 (如防災中心汰換案)", "預計破局時程": "持續維持"},
-        {"核心領域": "🌍 自由與探索", "目標描述": "解鎖 16 天絲路自駕與高難度alpine攝影計畫", "預計破局時程": "2026年10月"}
+    "mantra": "",
+    "step0_checks": [False, False, False, False, False],
+    # Part 1: Morning
+    "tolerated_dissatisfaction": "",
+    "complaints": [
+        {"🗣️ 抱怨 (過去一年的前三名)": "", "🕵️‍♂️ 真實情況 (旁觀者會覺得你其實想要什麼？)": ""},
+        {"🗣️ 抱怨 (過去一年的前三名)": "", "🕵️‍♂️ 真實情況 (旁觀者會覺得你其實想要什麼？)": ""},
+        {"🗣️ 抱怨 (過去一年的前三名)": "", "🕵️‍♂️ 真實情況 (旁觀者會覺得你其實想要什麼？)": ""}
     ],
-    "weekly_milestones": [
-        {"本週關鍵任務": "跑出一組多房間配置的危險度分級數據", "對應一年目標": "學術與技能", "緊急程度": "🔥 緊急高價值", "確認完成": False},
-        {"本週關鍵任務": "完成電梯汰換工程採購公文覆核 (費率 1.0%)", "對應一年目標": "專案與事業", "緊急程度": "⚡ 重要非緊急", "確認完成": False},
-        {"本週關鍵任務": "確認 eHi 租車西安/烏魯木齊異地還車細節", "對應一年目標": "自由與探索", "緊急程度": "☕ 日常維護", "確認完成": False}
-    ],
-    "daily_time_blocks": [
-        {"時間": "07:00 - 09:00", "核心焦點": "🔥 深度工作 (無干擾)", "具體產出 / 行動項目": "關閉手機，全力衝刺論文核心特徵萃取代碼與數據分析", "狀態": "未開始"},
-        {"時間": "09:00 - 10:00", "核心焦點": "☕ 緩衝休息", "具體產出 / 行動項目": "放空、盥洗、早餐、高意圖思考今天避開什麼", "狀態": "未開始"},
-        {"時間": "10:00 - 12:00", "核心焦點": "💼 淺度工作 (庶務)", "具體產出 / 行動項目": "處理局內公文、審核採購預算表、日常聯繫", "狀態": "未開始"},
-        {"時間": "13:00 - 14:00", "核心焦點": "🗺️ 探索/投資管理", "具體產出 / 行動項目": "規劃絲路自駕路況或覆盤美股 AI 電力基礎建設標的", "狀態": "未開始"},
-        {"時間": "14:00 以後", "核心焦點": "⏳ 自由支配 (斷開)", "具體產出 / 行動項目": "健身、閱讀、陪伴、或徹底放空放鬆", "狀態": "未開始"}
+    "unbearable_truth": "",
+    "anti_vision_5y": "",
+    "anti_vision_10y": "",
+    "anti_vision_end": "",
+    "anti_vision_ghost": "",
+    "identity_give_up": "",
+    "embarrassing_truth": "",
+    "self_protection": "",
+    "vision_3y": "",
+    "new_identity": "",
+    "immediate_action": "",
+    # Part 2: Throughout the Day
+    "alarm_1100": "",
+    "alarm_1330": "",
+    "alarm_1515": "",
+    "alarm_1700": "",
+    "alarm_1930": "",
+    "alarm_2100": "",
+    "bonus_1": "",
+    "bonus_2": "",
+    "bonus_3": "",
+    # Part 3: Evening
+    "true_block": "",
+    "actual_enemy": "",
+    "anti_vision_compressed": "",
+    "vision_compressed": "",
+    "one_year_lens": "",
+    "one_month_lens": "",
+    "daily_lens": "",
+    # Master Dashboard & Next Steps
+    "constraints": "",
+    "daily_levers": [
+        {"任務": "建立 3 個月後的進度追蹤器", "完成": False},
+        {"任務": "建立財務追蹤表", "完成": False},
+        {"任務": "停止喝奶茶 (戒除壞習慣)", "完成": False},
+        {"任務": "早上 10 點前回覆所有訊息，不拖延", "完成": False},
+        {"任務": "每天冥想", "完成": False}
     ]
 }
 
@@ -47,102 +75,142 @@ def save_data(data):
 data = load_data()
 
 # -----------------------------------------------------------------------------
-# 2. 響應式 RWD 介面渲染 (全繁體中文)
+# 2. 標題與 Step 0 (環境設定)
 # -----------------------------------------------------------------------------
-st.title("⚡ 1 天人生重塑作業系統 (How to Fix Your Life in 1 Day)")
-st.markdown("意識決定方向，系統決定結果。這套系統完美對應 Dan Koe 的核心日常架構。")
-st.divider()
+st.title("✨ 1 天重塑人生計畫 (The 1-Day Reset Protocol)")
+st.markdown("基於 Dan Koe 的重設協議。透過轉變身份來改變生活，打破自動導航模式，將人生變成一場可以破關的遊戲。")
 
-# ==========================================
-# 頂部：願景指南（雙欄 RWD 佈局）
-# ==========================================
-st.subheader("📌 模版第一部分：身份與意識錨定 (Identity Alignment)")
-col_v1, col_v2 = st.columns(2)
-
-with col_v1:
-    st.markdown("#### 🛑 反向願景 (The Anti-Vision)")
-    st.caption("痛苦是最好的燃料。寫下你一年後死也不想過的生活：")
-    updated_anti = st.text_area("我不允許自己變成這樣的人：", value=data["anti_vision"], height=120, key="anti_v_input")
-
-with col_v2:
-    st.markdown("#### 🏆 理想願景 (The Ideal Vision)")
-    st.caption("北極星指標。寫下你三年後真正渴望且具備主導權的生活：")
-    updated_ideal = st.text_area("這是我正在前往的終點：", value=data["ideal_vision"], height=120, key="ideal_v_input")
+with st.expander("🛑 Step 0: 環境設定 (開始前必讀)", expanded=True):
+    st.markdown("撥出一整天的時間。尋求獨處，進行數位排毒，並對自己保持殘酷的誠實。")
+    data["step0_checks"][0] = st.checkbox("理解：已閱讀過文章，了解核心概念。", value=data["step0_checks"][0])
+    data["step0_checks"][1] = st.checkbox("獨處：不閒晃、不社交。只有你一個人。", value=data["step0_checks"][1])
+    data["step0_checks"][2] = st.checkbox("時間：先撥出 30 分鐘到 1 小時來完成第一部分。", value=data["step0_checks"][2])
+    data["step0_checks"][3] = st.checkbox("數位排毒：不滑社群媒體、不看 YouTube。只有你的鬧鐘和這個儀表板。", value=data["step0_checks"][3])
+    data["step0_checks"][4] = st.checkbox("承諾：承諾用最殘酷、未經過濾的誠實來回答問題。", value=data["step0_checks"][4])
+    
+    st.markdown("❤️ **我的信念 (Mantra)**")
+    data["mantra"] = st.text_input("寫下一句激勵你改變生活、擁抱新身份的咒語：", value=data["mantra"])
 
 st.divider()
 
-# ==========================================
-# 中部：戰略拆解（雙欄 RWD 佈局）
-# ==========================================
-st.subheader("🎯 模版第二部分：目標逆向工程 (Goal Reverse Engineering)")
-col_g1, col_g2 = st.columns([1, 1.2])
-
-with col_g1:
-    st.markdown("#### 🚀 一年視角破局目標 (1-Year Goals)")
-    st.caption("在今年內，有哪三大具體事實能向世界證明你打破了舊循環？")
-    
-    df_year = pd.DataFrame(data["one_year_goals"])
-    edited_year = st.data_editor(
-        df_year, use_container_width=True, num_rows="dynamic", hide_index=True,
-        column_config={
-            "核心領域": st.column_config.SelectboxColumn("核心領域", options=["🚀 學術與技能", "💼 專案與事業", "🌍 自由與探索", "💰 財務與投資"], width="small"),
-            "目標描述": st.column_config.TextColumn("目標描述", width="large"),
-            "預計破局時程": st.column_config.TextColumn("時程", width="small")
-        }
-    )
-
-with col_g2:
-    st.markdown("#### 📅 一週視角核心里程碑 (Weekly Milestones)")
-    st.caption("為了讓一年目標發生，這星期有哪三件重要大案是你必須死守的底線？")
-    
-    df_week = pd.DataFrame(data["weekly_milestones"])
-    edited_week = st.data_editor(
-        df_week, use_container_width=True, num_rows="dynamic", hide_index=True,
-        column_config={
-            "本週關鍵任務": st.column_config.TextColumn("本週關鍵任務", width="large"),
-            "對應一年目標": st.column_config.TextColumn("對應領域", width="small"),
-            "緊急程度": st.column_config.SelectboxColumn("分類", options=["🔥 緊急高價值", "⚡ 重要非緊急", "☕ 日常維護"]),
-            "確認完成": st.column_config.CheckboxColumn("完成狀態", default=False)
-        }
-    )
-
-st.divider()
-
-# ==========================================
-# 底部：每日執行（單欄完美適應手機端）
-# ==========================================
-st.subheader("⏰ 模版第三部分：每日時間區塊防守矩陣 (Daily Time-Blocking)")
-st.markdown("不要填滿每一分鐘，而是保護你最神聖的 **4 小時深度工作**。")
-
-df_daily = pd.DataFrame(data["daily_time_blocks"])
-edited_daily = st.data_editor(
-    df_daily, use_container_width=True, num_rows="dynamic", hide_index=True,
-    column_config={
-        "時間": st.column_config.TextColumn("⏰ 時間範圍", width="small"),
-        "核心焦點": st.column_config.SelectboxColumn("🎯 核心焦點", options=["🔥 深度工作 (無干擾)", "💼 淺度工作 (庶務)", "☕ 緩衝休息", "🗺️ 探索/投資管理", "⏳ 自由支配 (斷開)"], width="medium"),
-        "具體產出 / 行動項目": st.column_config.TextColumn("📝 具體產出 / 行動項目（不可模糊，要有檢核點）", width="large"),
-        "狀態": st.column_config.SelectboxColumn("📌 狀態", options=["未開始", "執行中 ⚡", "已完成 ✅", "已順延 ☕"])
-    }
-)
-
 # -----------------------------------------------------------------------------
-# 3. 自動偵測變更與儲存機制
+# 3. 四大核心頁籤 (Tab 系統)
 # -----------------------------------------------------------------------------
-updated_year_list = edited_year.to_dict(orient="records")
-updated_week_list = edited_week.to_dict(orient="records")
-updated_daily_list = edited_daily.to_dict(orient="records")
+tab1, tab2, tab3, tab4 = st.tabs(["🌅 晨間：心理挖掘", "⏱️ 日間：中斷自動導航", "🌙 晚間：洞察總結", "🎯 終極儀表板"])
 
-if (updated_anti != data["anti_vision"] or 
-    updated_ideal != data["ideal_vision"] or 
-    updated_year_list != data["one_year_goals"] or 
-    updated_week_list != data["weekly_milestones"] or 
-    updated_daily_list != data["daily_time_blocks"]):
+# ==========================================
+# 頁籤 1：晨間 - 心理挖掘
+# ==========================================
+with tab1:
+    st.header("🌅 晨間 – 心理挖掘 (Vision & Anti-Vision)")
+    st.caption("為大腦建立新的認知框架。設定 15-30 分鐘。如果無法立刻回答，先留白，今天晚點再回來。")
     
-    data["anti_vision"] = updated_anti
-    data["ideal_vision"] = updated_ideal
-    data["one_year_goals"] = updated_year_list
-    data["weekly_milestones"] = updated_week_list
-    data["daily_time_blocks"] = updated_daily_list
+    st.subheader("● ● 區塊 A：你痛苦的現實 ● ●")
+    data["tolerated_dissatisfaction"] = st.text_area("1. 容忍的不滿：你已經學會與什麼樣沉悶且持續的不滿共存？", value=data["tolerated_dissatisfaction"])
     
-    save_data(data)
-    st.toast("💾 變更已自動同步儲存至系統！")
+    st.markdown("2. 抱怨審計表：你反覆抱怨但卻從未去改變的事情是什麼？")
+    df_complaints = pd.DataFrame(data["complaints"])
+    edited_complaints = st.data_editor(df_complaints, use_container_width=True, hide_index=True)
+    data["complaints"] = edited_complaints.to_dict(orient="records")
+    
+    data["unbearable_truth"] = st.text_area("3. 無法承受的真相：關於你目前的生活，什麼真相是讓你覺得如果告訴你深愛/尊敬的人，會感到無法承受的？", value=data["unbearable_truth"])
+
+    st.divider()
+    st.subheader("● ● 區塊 B：反向願景 (The Anti-Vision) ● ●")
+    col1_1, col1_2 = st.columns(2)
+    with col1_1:
+        data["anti_vision_5y"] = st.text_area("1) 5 年地獄：如果未來 5 年什麼都沒改變，描述一個平凡的週二。在哪醒來？身體感覺如何？做什麼工作？", value=data["anti_vision_5y"], height=150)
+        data["anti_vision_end"] = st.text_area("3) 生命終點：你到了生命盡頭。你活了最安全的版本，從未打破模式。代價是什麼？", value=data["anti_vision_end"], height=150)
+    with col1_2:
+        data["anti_vision_10y"] = st.text_area("2) 10 年地獄：現在想像 10 年後。你錯過了什麼？誰放棄了你？當你不在場時，別人怎麼說你？", value=data["anti_vision_10y"], height=150)
+        data["anti_vision_ghost"] = st.text_area("4) 未來的幽靈：你生活中誰已經活成了你剛才描述的未來？想到變成他們，你有什麼感覺？", value=data["anti_vision_ghost"], height=150)
+
+    st.divider()
+    st.subheader("● ● 區塊 C：阻力與身份 ● ●")
+    data["identity_give_up"] = st.text_area("5. 必須放棄的身份：要真正改變，你必須放棄什麼身份？(「我是那種...的人」) 不再做那個人，你會付出什麼社會代價？", value=data["identity_give_up"])
+    data["embarrassing_truth"] = st.text_area("6. 令人尷尬的真相：你沒有改變的最尷尬原因是什麼？那個聽起來讓你顯得軟弱、害怕或懶惰的真正原因？", value=data["embarrassing_truth"])
+    data["self_protection"] = st.text_area("7. 自我保護：如果你現在的行為是一種自我保護，你到底在保護什麼？這層保護又讓你付出了什麼代價？", value=data["self_protection"])
+
+    st.divider()
+    st.subheader("● ● 區塊 D：願景 MVP (The Vision MVP) ● ●")
+    data["vision_3y"] = st.text_area("1. 3 年天堂：如果 3 年後你活出完全不同的人生，一個平凡的週二長什麼樣？", value=data["vision_3y"])
+    data["new_identity"] = st.text_area("2. 新的身份：(寫下：「我是那種會...的人」)", value=data["new_identity"])
+    data["immediate_action"] = st.text_input("3. 立即行動：如果你已經是那個人，這禮拜你會做的「一件事」是什麼？", value=data["immediate_action"])
+
+# ==========================================
+# 頁籤 2：日間 - 中斷自動導航
+# ==========================================
+with tab2:
+    st.header("⏱️ 日間 – 中斷自動導航 (The Alarm Protocol)")
+    st.caption("🪄 把這些問題設定進你手機的鬧鐘標題。當鬧鐘響起時，立刻回答。你必須強制中斷大腦的慣性模式。")
+    
+    col2_1, col2_2 = st.columns(2)
+    with col2_1:
+        data["alarm_1100"] = st.text_area("11:00 am：我現在正在做的事，是為了逃避什麼？", value=data["alarm_1100"])
+        data["alarm_1515"] = st.text_area("3:15 pm：我現在是正朝著我討厭的生活前進，還是我想要的生活？", value=data["alarm_1515"])
+        data["alarm_1930"] = st.text_area("7:30 pm：今天我做了哪些事是出於「保護舊身份」而不是「真正的渴望」？", value=data["alarm_1930"])
+    with col2_2:
+        data["alarm_1330"] = st.text_area("1:30 pm：如果有人錄下我過去兩小時的行為，他們會認為我想從生活中得到什麼？", value=data["alarm_1330"])
+        data["alarm_1700"] = st.text_area("5:00 pm：什麼是最重要的事情，但我卻假裝它不重要？", value=data["alarm_1700"])
+        data["alarm_2100"] = st.text_area("9:00 pm：今天什麼時候我感覺最充滿活力？什麼時候感覺最死氣沉沉？", value=data["alarm_2100"])
+
+    st.divider()
+    st.markdown("#### 🚶‍♂️ 額外反思 (通勤、散步或躺著時思考)")
+    data["bonus_1"] = st.text_input("如果我不再需要別人視我為 [舊身份]，什麼會改變？", value=data["bonus_1"])
+    data["bonus_2"] = st.text_input("在生活中的哪個部分，我正在用「活力」換取「安全感」？", value=data["bonus_2"])
+    data["bonus_3"] = st.text_input("明天，我可以成為我渴望變成的那個人，最小的具體版本是什麼？", value=data["bonus_3"])
+
+# ==========================================
+# 頁籤 3：晚間 - 洞察總結
+# ==========================================
+with tab3:
+    st.header("🌙 晚間 – 洞察總結 (Synthesizing Insight)")
+    st.caption("🪄 經過這一天，我們需要將洞察提煉出來，開始邁向新的思維層級。")
+    
+    col3_1, col3_2 = st.columns(2)
+    with col3_1:
+        data["true_block"] = st.text_area("真正的阻礙：經過今天，關於你為何一直停滯不前，感覺最真實的原因是什麼？", value=data["true_block"], height=100)
+        data["anti_vision_compressed"] = st.text_area("反向願景 (壓縮版)：用一句話寫下你拒絕讓生活變成的樣子。(讀起來要有痛感)", value=data["anti_vision_compressed"], height=100)
+        data["one_year_lens"] = st.text_area("一年視角：一年後必須發生什麼具體事實，你才知道你已經打破了舊模式？", value=data["one_year_lens"], height=100)
+    with col3_2:
+        data["actual_enemy"] = st.text_area("真正的敵人：不是環境、不是別人。掌控你的內在模式或信念到底是什麼？", value=data["actual_enemy"], height=100)
+        data["vision_compressed"] = st.text_area("願景 MVP (壓縮版)：用一句話寫下你正在建設的未來。", value=data["vision_compressed"], height=100)
+        data["one_month_lens"] = st.text_area("一月視角：一個月後必須完成什麼，一年的目標才有可能實現？", value=data["one_month_lens"], height=100)
+
+    data["daily_lens"] = st.text_area("每日視角：明天你可以把哪 2-3 個行動排進時間區塊，是那個「未來的你」自然會去做的？", value=data["daily_lens"])
+
+# ==========================================
+# 頁籤 4：終極儀表板
+# ==========================================
+with tab4:
+    st.header("🕹️ 終極儀表板 (Master Dashboard)")
+    st.markdown("將上述的所有情感包袱與洞察，濃縮成這個 1 頁的每日導航圖。**下方欄位已自動帶入你在「晚間」寫下的總結。**")
+    
+    dash_col1, dash_col2 = st.columns(2)
+    
+    with dash_col1:
+        st.markdown("#### 🛑 1. 反向願景 (The Anti-Vision)")
+        st.info(data["anti_vision_compressed"] if data["anti_vision_compressed"] else "（請先至「晚間」分頁填寫反向願景壓縮版）")
+        
+        st.markdown("#### 1️⃣ 3. 一年目標 (The 1-Year Goal)")
+        st.info(data["one_year_lens"] if data["one_year_lens"] else "（請先至「晚間」分頁填寫一年視角）")
+        
+        st.markdown("#### ⚡ 5. 每日槓桿行動 (Daily Levers)")
+        st.caption("將推進專案的核心任務寫在這裡：")
+        df_levers = pd.DataFrame(data["daily_levers"])
+        edited_levers = st.data_editor(df_levers, use_container_width=True, hide_index=True,
+                                       column_config={"任務": st.column_config.TextColumn("具體任務", width="large"),
+                                                      "完成": st.column_config.CheckboxColumn("完成", default=False)})
+        data["daily_levers"] = edited_levers.to_dict(orient="records")
+
+    with dash_col2:
+        st.markdown("#### 🌅 2. 理想願景 (The Vision)")
+        st.success(data["vision_compressed"] if data["vision_compressed"] else "（請先至「晚間」分頁填寫願景壓縮版）")
+        
+        st.markdown("#### 🚧 4. 一個月專案 (The 1-Month Project)")
+        st.success(data["one_month_lens"] if data["one_month_lens"] else "（請先至「晚間」分頁填寫一月視角）")
+        
+        st.markdown("#### 🛡️ 6. 限制與底線 (Constraints)")
+        data["constraints"] = st.text_area("為了實現願景，我絕對不願意犧牲什麼？(例如：睡眠、家庭時間、健康)", value=data["constraints"], height=100)
+
+save_data(data)
