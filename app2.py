@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
-from datetime import datetime
+from datetime import datetime, date
 
 # -----------------------------------------------------------------------------
 # 1. 系統設定與 Google Sheets 雲端資料庫連線
@@ -14,8 +14,9 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 # 📢 【已綁定：你的專屬 Google 試算表網址】
 SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1vSL_FxL42qZv4bl_TqELWZ6Gyi17u1yEvV3uKdcwUPA/edit?usp=sharing"
 
-# 取得精確的儲存時間點（包含日期與時間）
+# 取得精確的時間點與今日日期
 NOW_STR = datetime.now().strftime("%Y-%m-%d %H:%M")
+TODAY_STR = str(date.today())
 
 # 預設文字區塊架構
 default_text_data = {
@@ -30,11 +31,11 @@ default_text_data = {
 }
 
 # -----------------------------------------------------------------------------
-# 2. 利用 Session State 鎖定資料，防止重整或重新渲染時文字消失
+# 2. 利用 Session State 鎖定資料，防止重新渲染時文字消失
 # -----------------------------------------------------------------------------
 if "load_database" not in st.session_state:
-    with st.spinner("正在從雲端安全載入您的個人作業系統與歷史檔案..."):
-        # 讀取文字區塊 (ttl=0 徹底關閉快取)
+    with st.spinner("正在從雲端安全載入您的全套重塑人生作業系統..."):
+        # 讀取文字區塊
         try:
             df_text = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="text_data", ttl=0)
             if df_text.empty or "key" not in df_text.columns:
@@ -70,7 +71,7 @@ if "load_database" not in st.session_state:
         except Exception:
             st.session_state["df_levers"] = pd.DataFrame([{"任務": "新任務範例", "完成": False}])
             
-        # 🔔 新增：讀取全時歷史紀錄流
+        # 讀取全時歷史大框架紀錄流
         try:
             df_history = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="history_log", ttl=0)
             if df_history.empty or "儲存時間點" not in df_history.columns:
@@ -79,22 +80,50 @@ if "load_database" not in st.session_state:
                 st.session_state["df_history"] = df_history
         except Exception:
             st.session_state["df_history"] = pd.DataFrame(columns=["儲存時間點", "❤️ 核心信念", "🛑 反向願景", "🌅 理想願景", "1️⃣ 一年目標", "🚧 一個月專案"])
+
+        # 讀取 Notion 每日復盤日誌流
+        try:
+            df_daily_log = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="daily_review_log", ttl=0)
+            if df_daily_log.empty or "日期" not in df_daily_log.columns:
+                st.session_state["df_daily_log"] = pd.DataFrame(columns=["日期", "⏰ 昨晚是否早睡", "👁️ 是否正視他人/敢與女生說話", "⚡ 是否推進核心學習/工作", "🥗 是否控制飲食/運動", "📊 當日情緒穩定分數 (1-5)", "📝 一句話核心反思"])
+            else:
+                st.session_state["df_daily_log"] = df_daily_log
+        except Exception:
+            st.session_state["df_daily_log"] = pd.DataFrame(columns=["日期", "⏰ 昨晚是否早睡", "👁️ 是否正視他人/敢與女生說話", "⚡ 是否推進核心學習/工作", "🥗 是否控制飲食/運動", "📊 當日情緒穩定分數 (1-5)", "📝 一句話核心反思"])
+
+        # 🔔 新增：從 Google Sheets 載入 Notion 週計畫看盤 (WORKSHEET: weekly_blueprint)
+        try:
+            df_weekly = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="weekly_blueprint", ttl=0)
+            if df_weekly.empty or "時間分配" not in df_weekly.columns:
+                st.session_state["df_weekly"] = pd.DataFrame([
+                    {"時間分配": "星期一 (Mon)", "🔥 深度核心工作 / 學習計畫": "跑 GCN-TCAN 住宅模型空間特徵萃取數據", "💼 淺度工作 / 局內庶務": "覆核防災中心電梯汰換工程公文及預算表", "⏳ 自由支配 / 探索充電": "閱讀美股 AI 相關電力與能源建設基礎報告"},
+                    {"時間分配": "星期二 (Tue)", "🔥 深度核心工作 / 學習計畫": "優化多房間 Layout 危險度分級演算法", "💼 淺度工作 / 局內庶務": "處理工程採購管理費率 1.0% 計算書", "⏳ 自由支配 / 探索充電": "慢跑 3 公里、徹底戒奶茶"},
+                    {"時間分配": "星期三 (Wed)", "🔥 深度核心工作 / 學習計畫": "撰寫論文核心章節與指導教授開會準備", "💼 淺度工作 / 局內庶務": "局內日常公文核稿、聯繫外包廠商", "⏳ 自由支配 / 探索充電": "練習社交對談、嘗試正視他人眼睛 2 秒"},
+                    {"時間分配": "星期四 (Thu)", "🔥 深度核心工作 / 學習計畫": "驗證 5-fold 交叉驗證數據的穩定性", "💼 淺度工作 / 局內庶務": "召開防災中心汰換專案內部進度會議", "⏳ 自由支配 / 探索充電": "追蹤美股高增長標的趨勢、早睡"},
+                    {"時間分配": "星期五 (Fri)", "🔥 深度核心工作 / 學習計畫": "統整火災模擬 FDS/CFAST 數據集", "💼 淺度工作 / 局內庶務": "清理本週未完的局內行政公文", "⏳ 自由支配 / 探索充電": "規劃 10 月絲路 16 天自駕（西安到烏魯木齊）行程細節"},
+                    {"時間分配": "星期六 (Sat)", "🔥 深度核心工作 / 學習計畫": "補足本週落後的硬核論文代碼與學術閱讀", "💼 淺度工作 / 局內庶務": "完全斷開公務、不收發局內訊息", "⏳ 自由支配 / 探索充電": "出門進行戶外攝影或無壓力放空"},
+                    {"時間分配": "星期日 (Sun)", "🔥 深度核心工作 / 學習計畫": "利用本網頁回顧這一週的所有每日復盤日誌", "💼 淺度工作 / 局內庶務": "進行一週抱怨審計與思想存檔點確認", "⏳ 自由支配 / 探索充電": "定錨下一週的 Weekly Blueprint 行程"}
+                ])
+            else:
+                st.session_state["df_weekly"] = df_weekly
+        except Exception:
+            st.session_state["df_weekly"] = pd.DataFrame([{"時間分配": "星期一", "🔥 深度核心工作 / 學習計畫": "", "💼 淺度工作 / 局內庶務": "", "⏳ 自由支配 / 探索充電": ""}])
             
         st.session_state["load_database"] = True
 
 # -----------------------------------------------------------------------------
-# 3. 側邊欄控制台：獨立儲存按鈕
+# 3. 側邊欄控制台：獨立儲存按鈕 (一鍵寫入 6 個工作表)
 # -----------------------------------------------------------------------------
 with st.sidebar:
     st.header("⚙️ 系統控制台")
-    st.markdown("為了防止瀏覽器重新整理導致數據丟失，請在填寫完一個階段後，點擊下方按鈕同步至雲端：")
-    save_button = st.button("💾 點我同步儲存至雲端", type="primary", use_container_width=True)
+    st.markdown("當你填寫完心理挖掘、**修改了週計畫看板**或調整藍圖後，點擊下方按鈕一鍵同步：")
+    save_button = st.button("💾 一鍵同步儲存至雲端", type="primary", use_container_width=True)
 
 # -----------------------------------------------------------------------------
 # 4. 響應式 RWD 介面渲染
 # -----------------------------------------------------------------------------
 st.title("⚡ 1 天重塑人生計畫 (The 1-Day Reset Protocol)")
-st.markdown("基於 Dan Koe 經典框架 · 本系統已具備記憶體防丟失、全自動歷史流與雲端同步機制。")
+st.markdown("基於 Dan Koe 經典框架 · 本系統已整合「心理挖掘、每日量化復盤、週戰略計畫看板」並與 Google Sheets 完美同步。")
 
 # 信念與基礎宣告
 st.markdown("❤️ **我的信念 (Mantra)**")
@@ -106,7 +135,7 @@ st.session_state["text_dict"]["mantra"] = st.text_input(
 st.divider()
 
 # 四大核心頁籤
-tab1, tab2, tab3, tab4 = st.tabs(["🌅 晨間：心理挖掘", "⏱️ 日間：中斷自動導航", "🌙 晚間：洞察總結", "🎯 終極儀表板"])
+tab1, tab2, tab3, tab4 = st.tabs(["🌅 晨間：心理挖掘", "⏱️ 日間：中斷自動導航", "🌙 晚間：洞察總結", "🎯 終極戰略儀表板"])
 
 # ==========================================
 # 頁籤 1：晨間 - 心理挖掘
@@ -129,7 +158,7 @@ with tab1:
         st.session_state["text_dict"]["anti_vision_5y"] = st.text_area("1) 5 年地獄：如果未來 5 年什麼都沒改變，描述一個平凡的週二。", value=st.session_state["text_dict"].get("anti_vision_5y", ""), height=150)
         st.session_state["text_dict"]["anti_vision_end"] = st.text_area("3) 生命終點：你到了生命盡頭。你活了最安全的版本，代價是什麼？", value=st.session_state["text_dict"].get("anti_vision_end", ""), height=150)
     with col1_2:
-        st.session_state["text_dict"]["anti_vision_10y"] = st.text_area("2) 10 年地獄：現在想像 10 年後。你錯過了什麼？誰放棄了你？", value=st.session_state["text_dict"].get("anti_vision_10y", ""), height=150)
+        st.session_state["text_dict"]["anti_vision_10y"] = st.text_area("2) 10 年地獄：現在想像 10 年後。你錯過了什麼？誰放棄了起？", value=st.session_state["text_dict"].get("anti_vision_10y", ""), height=150)
         st.session_state["text_dict"]["anti_vision_ghost"] = st.text_area("4) 未來的幽靈：你生活中誰已經活成了你剛才描述的未來？", value=st.session_state["text_dict"].get("anti_vision_ghost", ""), height=150)
 
     st.divider()
@@ -182,11 +211,11 @@ with tab3:
     st.session_state["text_dict"]["daily_lens"] = st.text_area("每日視角：明天你可以把哪 2-3 個行動排進時間區塊？", value=st.session_state["text_dict"].get("daily_lens", ""))
 
 # ==========================================
-# 頁籤 4：終極儀表板 (Master Dashboard)
+# 頁籤 4：終極儀表板 (Master Dashboard) 完美整合版
 # ==========================================
 with tab4:
-    st.header("🕹️ 終極儀表板 (Master Dashboard)")
-    st.markdown("下方欄位會即時同步你在「晚間」分頁寫下的精煉總結。")
+    st.header("🎯 終極戰略控制中心 (Master Dashboard)")
+    st.markdown("此儀表板會即時同步你在「晚間」分頁寫下的核心高精煉總結。")
     
     dash_col1, dash_col2 = st.columns(2)
     with dash_col1:
@@ -196,7 +225,7 @@ with tab4:
         st.markdown("#### 1️⃣ 3. 一年目標 (The 1-Year Goal)")
         st.info(st.session_state["text_dict"]["one_year_lens"] if st.session_state["text_dict"].get("one_year_lens") else "（請先至「晚間」分頁填寫一年視角）")
         
-        st.markdown("#### ⚡ 5. 每日槓桿行動 (Daily Levers)")
+        st.markdown("#### ⚡ 5. 每日高槓桿行動 (Daily Levers)")
         st.session_state["df_levers"] = st.data_editor(st.session_state["df_levers"], use_container_width=True, num_rows="dynamic", hide_index=True, key="ed_lev")
 
     with dash_col2:
@@ -209,17 +238,82 @@ with tab4:
         st.markdown("#### 🛡️ 6. 限制與底線 (Constraints)")
         st.session_state["text_dict"]["constraints"] = st.text_area("為了實現願景，我絕對不願意犧牲什麼？", value=st.session_state["text_dict"].get("constraints", ""), height=100)
 
-    # 🔔 新增：歷史累積紀錄流渲染區塊
+    # 🔔 【全新強大功能：Notion 週戰略計畫藍圖看板 (Weekly Blueprint)】
     st.divider()
-    st.subheader("📜 歷史全時紀錄流 (截至目前填寫軌跡)")
-    st.caption("只要點擊左側的「同步儲存」，系統就會把那一刻的思考結晶追加到下方，形成你的思想進化史。")
+    st.subheader("📅 一週戰略計畫藍圖 (Weekly Blueprint)")
+    st.markdown("這是你的命運沙盤推演。**您可以直接雙擊下方表格中的任何一個格子，自訂安排週一至週日的戰術部署**。")
+    st.caption("💡 修改完表格後，記得點擊左側控制台的「💾 一鍵同步儲存至雲端」將週行程永久儲存。")
+    
+    st.session_state["df_weekly"] = st.data_editor(
+        st.session_state["df_weekly"],
+        use_container_width=True,
+        hide_index=True,
+        key="ed_weekly",
+        column_config={
+            "時間分配": st.column_config.TextColumn("📅 時間範圍", disabled=True, width="small"),
+            "🔥 深度核心工作 / 學習計畫": st.column_config.TextColumn("🔥 深度核心工作 / 核心技能學習計畫", width="large"),
+            "💼 淺度工作 / 局內庶務": st.column_config.TextColumn("💼 淺度工作 / 行政庶務核稿", width="medium"),
+            "⏳ 自由支配 / 探索充電": st.column_config.TextColumn("⏳ 自由支配 / 投資探索與生活充電", width="medium")
+        }
+    )
+
+    # 🔔 Notion 每日量化復盤日誌區塊
+    st.divider()
+    st.subheader("📊 每日命運對抗復盤 (擊敗平庸與自動導航)")
+    st.caption(f"今天是：`{TODAY_STR}`。臨睡前花 1 分鐘打勾，檢視你對抗「舊身份硬傷」的戰果。")
+    
+    rev_col1, rev_col2, rev_col3 = st.columns([1, 1, 1.5])
+    with rev_col1:
+        rev_sleep = st.checkbox("⏰ 昨晚是否在 12 點前早睡？ (拿回理性大腦主導權)", value=False)
+        rev_social = st.checkbox("👁️ 今天對談是否有直視他人眼睛/敢跟女生正常說話？", value=False)
+    with rev_col2:
+        rev_study = st.checkbox("⚡ 今天是否有推進高槓桿學習/工作？ (研究論文/預算審查)", value=False)
+        rev_diet = st.checkbox("🥗 今天是否有控制飲食與運動習慣？ (管住嘴、拒絕奶茶)", value=False)
+    with rev_col3:
+        rev_emotion = st.slider("📊 今日情緒穩定與克制衝動分數 (1:極度情緒化, 5:冷靜理性掌控者)", 1, 5, 3)
+        rev_note = st.text_input("📝 一句話核心反思：", placeholder="今天你在什麼地方差點向舊習慣妥協？")
+
+    # 提交每日復盤的按鈕
+    submit_daily_review = st.button("🚀 提交今日復盤日誌並寫入雲端", type="primary")
+
+    if submit_daily_review:
+        with st.spinner("正在將今日戰果同步追加至 Google 試算表歷史庫..."):
+            try:
+                new_review_row = pd.DataFrame([{
+                    "日期": TODAY_STR,
+                    "⏰ 昨晚是否早睡": "✅ 是" if rev_sleep else "❌ 否",
+                    "👁️ 是否正視他人/敢與女生說話": "✅ 是" if rev_social else "❌ 否",
+                    "⚡ 是否推進核心學習/工作": "✅ 是" if rev_study else "❌ 否",
+                    "🥗 是否控制飲食/運動": "✅ 是" if rev_diet else "❌ 否",
+                    "📊 當日情緒穩定分數 (1-5)": rev_emotion,
+                    "📝 一句話核心反思": rev_note
+                }])
+                
+                # 自動去重
+                st.session_state["df_daily_log"] = st.session_state["df_daily_log"][st.session_state["df_daily_log"]["日期"] != TODAY_STR]
+                st.session_state["df_daily_log"] = pd.concat([st.session_state["df_daily_log"], new_review_row], ignore_index=True)
+                
+                # 獨立即時寫入雲端 daily_review_log 工作表
+                conn.update(spreadsheet=SPREADSHEET_URL, worksheet="daily_review_log", data=st.session_state["df_daily_log"])
+                st.success(f"🎉 {TODAY_STR} 戰果已安全同步！你今天成功擊退了舊的逃避身份！")
+                st.balloons()
+            except Exception as e:
+                st.error(f"日誌儲存失敗，請確保試算表內已手動建立 daily_review_log 分頁標籤。錯誤: {e}")
+
+    # 呈現歷史流水帳
+    st.markdown("#### 📊 我的重塑歷史數據流水帳 (全天候累積軌跡)")
+    st.dataframe(st.session_state["df_daily_log"], use_container_width=True, hide_index=True)
+
+    # 歷史計畫存檔流
+    st.divider()
+    st.subheader("📜 戰略藍圖進化軌跡 (計畫變更存檔點)")
     st.dataframe(st.session_state["df_history"], use_container_width=True, hide_index=True)
 
 # -----------------------------------------------------------------------------
-# 5. 手動觸發雲端儲存與歷史追加機制
+# 5. 手動觸發雲端儲存與歷史大框架追加機制
 # -----------------------------------------------------------------------------
 if save_button:
-    with st.spinner("雲端試算表同步中，正在為當前意志留下歷史存檔點..."):
+    with st.spinner("雲端試算表全面寫入同步中..."):
         try:
             # 1. 建立當前的歷史新切片
             new_entry = pd.DataFrame([{
@@ -230,21 +324,19 @@ if save_button:
                 "1️⃣ 一年目標": st.session_state["text_dict"]["one_year_lens"],
                 "🚧 一個月專案": st.session_state["text_dict"]["one_month_lens"]
             }])
-            
-            # 2. 追加至歷史 DataFrame 中
             st.session_state["df_history"] = pd.concat([st.session_state["df_history"], new_entry], ignore_index=True)
             
-            # 3. 轉換文字字典為 DataFrame 格式
+            # 2. 轉換文字字典為 DataFrame 格式
             df_text_save = pd.DataFrame(list(st.session_state["text_dict"].items()), columns=["key", "value"])
             
-            # 4. 強制全面寫入 Google Sheets 四個分頁
+            # 3. 強制全面更新寫入 Google Sheets 中的所有對應分頁
             conn.update(spreadsheet=SPREADSHEET_URL, worksheet="text_data", data=df_text_save)
             conn.update(spreadsheet=SPREADSHEET_URL, worksheet="complaints", data=st.session_state["df_complaints"])
             conn.update(spreadsheet=SPREADSHEET_URL, worksheet="daily_levers", data=st.session_state["df_levers"])
             conn.update(spreadsheet=SPREADSHEET_URL, worksheet="history_log", data=st.session_state["df_history"])
+            conn.update(spreadsheet=SPREADSHEET_URL, worksheet="weekly_blueprint", data=st.session_state["df_weekly"])
             
-            st.success("✅ 雲端同步成功！已為你當下的意志留下歷史存檔點！")
-            st.balloons()
-            st.rerun() # 重新整理由後端載入最新排列
+            st.success("✅ 雲端大框架與「一週戰略計畫藍圖」全部同步成功！")
+            st.rerun() 
         except Exception as e:
-            st.error(f"儲存失敗，請檢查 Google 試算表的分頁名稱是否拼寫正確。錯誤訊息: {e}")
+            st.error(f"大框架儲存失敗，請檢查 Google 試算表的分頁名稱。錯誤訊息: {e}")
