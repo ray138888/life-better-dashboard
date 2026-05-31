@@ -89,7 +89,7 @@ if "load_database" not in st.session_state:
             else:
                 st.session_state["df_daily_log"] = df_daily_log
         except Exception:
-            st.session_state["df_daily_log"] = pd.DataFrame(columns=["日期", "⏰ 昨晚是否早睡", "👁️ 是否正視他人/敢與女生說話", "⚡ 是否推進核心學習/工作", "🥗 是否控制飲食/運動", "📊 當日情緒穩定分數 (1-5)", "📝 一句話核心反思"])
+            st.session_state["df_daily_log"] = pd.DataFrame(columns=["開期", "⏰ 昨晚是否早睡", "👁️ 是否正視他人/敢與女生說話", "⚡ 是否推進核心學習/工作", "🥗 是否控制飲食/運動", "📊 當日情緒穩定分數 (1-5)", "📝 一句話核心反思"])
 
         # 讀取週計畫看盤
         try:
@@ -109,7 +109,7 @@ if "load_database" not in st.session_state:
         except Exception:
             st.session_state["df_weekly"] = pd.DataFrame([{"時間分配": "星期一", "🔥 深度核心工作 / 學習計畫": "", "💼 淺度工作 / 局內庶務": "", "⏳ 自由支配 / 探索充電": ""}])
             
-        # 🔔 新增：從 Google Sheets 載入 KISS 每日復盤流水帳 (WORKSHEET: kiss_review_log)
+        # 讀取 KISS 每日復盤流水帳
         try:
             df_kiss_log = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="kiss_review_log", ttl=0)
             if df_kiss_log.empty or "日期" not in df_kiss_log.columns:
@@ -142,7 +142,7 @@ st.divider()
 tab1, tab2, tab3, tab4 = st.tabs(["🌅 晨間：心理挖掘", "⏱️ 日間：中斷自動導航", "🌙 晚間：洞察總結", "🎯 終極戰略儀表板"])
 
 # ==========================================
-# 頁籤 1 ~ 3：保持原有的 Dan Koe 核心拷問
+# 頁籤 1 ~ 3：Dan Koe 核心拷問
 # ==========================================
 with tab1:
     st.header("🌅 晨間 – 心理挖掘")
@@ -176,7 +176,7 @@ with tab2:
     col2_1, col2_2 = st.columns(2)
     with col2_1:
         st.session_state["text_dict"]["alarm_1100"] = st.text_area("11:00 am：我現在正在做的事，是為了逃避什麼？", value=st.session_state["text_dict"].get("alarm_1100", ""))
-        st.session_state["text_dict"]["alarm_1515"] = st.text_area("3:15 pm：我現在是正朝著我討厭的生活前記，還是我想要的生活？", value=st.session_state["text_dict"].get("alarm_1515", ""))
+        st.session_state["text_dict"]["alarm_1515"] = st.text_area("3:15 pm：我現在是正朝著我討厭的生活前進，還是我想要的生活？", value=st.session_state["text_dict"].get("alarm_1515", ""))
         st.session_state["text_dict"]["alarm_1930"] = st.text_area("7:30 pm：今天我做了哪些事是出於「保護舊身份」而不是「真正的渴望」？", value=st.session_state["text_dict"].get("alarm_1930", ""))
     with col2_2:
         st.session_state["text_dict"]["alarm_1330"] = st.text_area("1:30 pm：如果有人錄下我過去兩小時的行為，他們會認為我想從生活中得到什麼？", value=st.session_state["text_dict"].get("alarm_1330", ""))
@@ -235,83 +235,89 @@ with tab4:
         }
     )
 
-    # 🔥 【全新強大功能：KISS 每日滾動高能復盤 (Keep / Improve / Start / Stop)】
+    # KISS 每日滾動高能復盤
     st.divider()
     st.subheader("💋 KISS 每日敏捷進化復盤 (Keep / Improve / Start / Stop)")
-    st.markdown("每天可以不斷填寫與更新。欄位會天天重置，但你提交的每一次歷史紀錄都會按你指定的「美式英文日期格式」永久沉澱至雲端。")
-    
-    # 讓使用者自由挑選日期，預設為今天，並自動轉換成像是 "February 14, 2025" 的美式文字格式
-    picked_date = st.date_input("📆 請選擇復盤日期：", value=date.today())
-    KISS_DATE_STR = picked_date.strftime("%B %d, %Y") # 精準格式化：例如 "May 31, 2026"
+    picked_date = st.date_input("📆 請選擇 KISS 復盤日期：", value=date.today(), key="kiss_date_picker")
+    KISS_DATE_STR = picked_date.strftime("%B %d, %Y")
     
     st.info(f"✍️ 您正在填寫 **{KISS_DATE_STR}** 的 KISS 戰術進化報告：")
-    
     kiss_col1, kiss_col2 = st.columns(2)
     with kiss_col1:
-        kiss_keep = st.text_area("🟢 Keep (今天做得很好，未來要繼續保持的習慣/心態？)", placeholder="例如：今天對談時有直視主管眼睛2秒、堅持沒點奶茶。")
-        kiss_improve = st.text_area("🟡 Improve (今天有哪些地方做得不夠好，亟需改進與調整？)", placeholder="例如：晚上11點後又忍不住開始滑美股自選股，導致大腦過度興奮。")
+        kiss_keep = st.text_area("🟢 Keep (今天做得很好，未來要繼續保持的習慣/心態？)", placeholder="例如：對談時有直視眼睛2秒、堅持沒點奶茶。", key="k_input")
+        kiss_improve = st.text_area("🟡 Improve (今天有哪些地方做得不夠好，亟需改進與調整？)", placeholder="例如：晚上11點後又忍不住開始滑美股，導致大腦過度興奮。", key="i_input")
     with kiss_col2:
-        kiss_start = st.text_area("🚀 Start (為了擊敗舊身份，明天有哪些行動必須馬上啟動？)", placeholder="例如：明天上班前先去買無糖豆漿，中斷對含糖飲料的依賴。")
-        kiss_stop = st.text_area("🛑 Stop (有哪些消耗精力、引發情緒化的壞習慣必須立刻停止？)", placeholder="例如：立刻停止半途而廢的心態，模型代碼卡住時不准立刻關掉視窗。")
+        kiss_start = st.text_area("🚀 Start (為了擊敗舊身份，明天有哪些行動必須馬上啟動？)", placeholder="例如：明天上班前先去買無糖豆漿，中斷對含糖飲料的依賴。", key="s_input")
+        kiss_stop = st.text_area("🛑 Stop (有哪些消耗精力、引發情緒化的壞習慣必須立刻停止？)", placeholder="例如：立刻停止半途而廢的心態，代碼卡住時不准立刻關掉視窗。", key="st_input")
 
-    # 提交 KISS 日誌按鈕
     submit_kiss = st.button("🚀 提交今日 KISS 進化報告", type="primary")
-
     if submit_kiss:
-        with st.spinner("正在將 KISS 數據寫入雲端防丟失庫..."):
+        with st.spinner("正在將 KISS 數據寫入雲端..."):
             try:
-                # 建立 KISS 新列
-                new_kiss_row = pd.DataFrame([{
-                    "日期": KISS_DATE_STR,
-                    "🟢 Keep (繼續保持)": kiss_keep,
-                    "🟡 Improve (亟需改進)": kiss_improve,
-                    "🚀 Start (馬上啟動)": kiss_start,
-                    "🛑 Stop (立刻停止)": kiss_stop
-                }])
-                
-                # 防呆去重：若選取的日期在 Google Sheets 裡已填過，則自動覆蓋
+                new_kiss_row = pd.DataFrame([{"日期": KISS_DATE_STR, "🟢 Keep (繼續保持)": kiss_keep, "🟡 Improve (亟需改進)": kiss_improve, "🚀 Start (馬上啟動)": kiss_start, "🛑 Stop (立刻停止)": kiss_stop}])
                 st.session_state["df_kiss_log"] = st.session_state["df_kiss_log"][st.session_state["df_kiss_log"]["日期"] != KISS_DATE_STR]
                 st.session_state["df_kiss_log"] = pd.concat([st.session_state["df_kiss_log"], new_kiss_row], ignore_index=True)
-                
-                # 同步到雲端專屬工作表
                 conn.update(spreadsheet=SPREADSHEET_URL, worksheet="kiss_review_log", data=st.session_state["df_kiss_log"])
                 st.success(f"🎉 {KISS_DATE_STR} 的 KISS 戰術進化報告已成功安全同步！")
                 st.balloons()
-            except Exception as e:
-                st.error(f"KISS 儲存失敗，請確認 Google Sheets 底部是否有建立名為 kiss_review_log 的標籤頁。錯誤: {e}")
+            except Exception as e: st.error(f"KISS 儲存失敗: {e}")
 
-    # 即時在網頁下方拉出歷史 KISS 清單，隨時檢視目前為止寫了什麼
-    st.markdown("#### 📜 我的歷史 KISS 進化軌跡 (截至目前為止的所有更新)")
+    st.markdown("#### 📜 我的歷史 KISS 進化軌跡")
     st.dataframe(st.session_state["df_kiss_log"], use_container_width=True, hide_index=True)
 
-    # 基礎指標打勾復盤
+    # 🔥 【完美修復：具備每日更新、滾動重置功能的基礎指標打勾追蹤】
     st.divider()
-    st.subheader("📊 每日基礎指標打勾 (習慣追蹤)")
+    st.subheader("📊 每日基礎指標打勾 (習慣與狀態追蹤)")
+    st.markdown("此區塊已全面升級為**「動態滾動重置」**。切換新日期時，打勾方塊與滑桿會自動清空，方便您依照實際情況填寫。")
+    
+    # 🔔 指標打勾區塊的專屬日期定錨器
+    picked_review_date = st.date_input("📆 請選擇指標追蹤日期：", value=date.today(), key="review_date_picker")
+    REVIEW_DATE_STR = str(picked_review_date) # 儲存標準格式如 "2026-05-31"
+    
+    st.info(f"✍️ 正在填寫 **{REVIEW_DATE_STR}** 的實際行為指標：")
+    
     rev_col1, rev_col2, rev_col3 = st.columns([1, 1, 1.5])
     with rev_col1:
-        rev_sleep = st.checkbox("⏰ 昨晚是否在 12 點前早睡？", value=False)
-        rev_social = st.checkbox("👁️ 今天對談是否有直視他人眼睛/敢跟女生正常說話？", value=False)
+        rev_sleep = st.checkbox("⏰ 昨晚是否在 12 點前早睡？ (拿回理性大腦主導權)", value=False, key=f"chk_sleep_{REVIEW_DATE_STR}")
+        rev_social = st.checkbox("👁️ 今天對談是否有直視他人眼睛/敢跟女生正常說話？", value=False, key=f"chk_social_{REVIEW_DATE_STR}")
     with rev_col2:
-        rev_study = st.checkbox("⚡ 今天是否有推進高槓桿學習/工作？", value=False)
-        rev_diet = st.checkbox("🥗 今天是否有控制飲食與運動習慣？", value=False)
+        rev_study = st.checkbox("⚡ 今天是否有推進高槓桿學習/工作？ (研究論文/預算審查)", value=False, key=f"chk_study_{REVIEW_DATE_STR}")
+        rev_diet = st.checkbox("🥗 今天是否有控制飲食與運動習慣？ (管住嘴、拒絕奶茶)", value=False, key=f"chk_diet_{REVIEW_DATE_STR}")
     with rev_col3:
-        rev_emotion = st.slider("📊 今日情緒穩定分數 (1:情緒化, 5:極度冷靜)", 1, 5, 3)
-        rev_note = st.text_input("📝 一句話核心反思：")
+        # 加上動態 Key，只要切換日期，滑桿與文字框就會立刻重置為預設值
+        rev_emotion = st.slider("📊 今日情緒穩定與克制衝動分數 (1:極度情緒化, 5:冷靜理性掌控者)", 1, 5, 3, key=f"sld_emo_{REVIEW_DATE_STR}")
+        rev_note = st.text_input("📝 一句話核心反思：", placeholder="今天你在什麼地方差點向舊習慣妥協？", key=f"txt_note_{REVIEW_DATE_STR}")
 
-    submit_daily_review = st.button("🚀 提交基礎打勾日誌", type="secondary")
+    submit_daily_review = st.button("🚀 提交該日指標日誌並寫入雲端", type="primary", key="btn_review_submit")
     if submit_daily_review:
-        with st.spinner("同步指標中..."):
+        with st.spinner("正在將指標戰果同步至雲端試算表..."):
             try:
-                new_review_row = pd.DataFrame([{"日期": TODAY_STR, "⏰ 昨晚是否早睡": "✅ 是" if rev_sleep else "❌ 否", "👁️ 是否正視他人/敢與女生說話": "✅ 是" if rev_social else "❌ 否", "⚡ 是否推進核心學習/工作": "✅ 是" if rev_study else "❌ 否", "🥗 是否控制飲食/運動": "✅ 是" if rev_diet else "❌ 否", "📊 當日情緒穩定分數 (1-5)": rev_emotion, "📝 一句話核心反思": rev_note}])
-                st.session_state["df_daily_log"] = st.session_state["df_daily_log"][st.session_state["df_daily_log"]["日期"] != TODAY_STR]
+                # 建立新紀錄
+                new_review_row = pd.DataFrame([{
+                    "日期": REVIEW_DATE_STR,
+                    "⏰ 昨晚是否早睡": "✅ 是" if rev_sleep else "❌ 否",
+                    "👁️ 是否正視他人/敢與女生說話": "✅ 是" if rev_social else "❌ 否",
+                    "⚡ 是否推進核心學習/工作": "✅ 是" if rev_study else "❌ 否",
+                    "🥗 是否控制飲食/運動": "✅ 是" if rev_diet else "❌ 否",
+                    "📊 當日情緒穩定分數 (1-5)": rev_emotion,
+                    "📝 一句話核心反思": rev_note
+                }])
+                
+                # 自動去重覆蓋
+                st.session_state["df_daily_log"] = st.session_state["df_daily_log"][st.session_state["df_daily_log"]["日期"] != REVIEW_DATE_STR]
                 st.session_state["df_daily_log"] = pd.concat([st.session_state["df_daily_log"], new_review_row], ignore_index=True)
+                
+                # 寫入工作表 daily_review_log
                 conn.update(spreadsheet=SPREADSHEET_URL, worksheet="daily_review_log", data=st.session_state["df_daily_log"])
-                st.success("🎉 指標打勾同步成功！")
-            except Exception as e: st.error(f"錯誤: {e}")
+                st.success(f"🎉 {REVIEW_DATE_STR} 的基礎指標已成功寫入雲端！")
+                st.balloons()
+            except Exception as e:
+                st.error(f"指標儲存失敗，請確保試算表內有名為 daily_review_log 的分頁。錯誤: {e}")
 
+    st.markdown("#### 📊 我的重塑歷史數據流水帳 (全天候累積軌跡)")
     st.dataframe(st.session_state["df_daily_log"], use_container_width=True, hide_index=True)
 
-    # 歷史大框架
+    # 歷史計畫存檔流
     st.divider()
     st.subheader("📜 戰略藍圖進化軌跡 (計畫變更存檔點)")
     st.dataframe(st.session_state["df_history"], use_container_width=True, hide_index=True)
