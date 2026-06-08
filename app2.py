@@ -89,7 +89,7 @@ if "load_database" not in st.session_state:
             else:
                 st.session_state["df_daily_log"] = df_daily_log
         except Exception:
-            st.session_state["df_daily_log"] = pd.DataFrame(columns=["開期", "⏰ 昨晚是否早睡", "👁️ 是否正視他人/敢與女生說話", "⚡ 是否推進核心學習/工作", "🥗 是否控制飲食/運動", "📊 當日情緒穩定分數 (1-5)", "📝 一句話核心反思"])
+            st.session_state["df_daily_log"] = pd.DataFrame(columns=["日期", "⏰ 昨晚是否早睡", "👁️ 是否正視他人/敢與女生說話", "⚡ 是否推進核心學習/工作", "🥗 是否控制飲食/運動", "📊 當日情緒穩定分數 (1-5)", "📝 一句話核心反思"])
 
         # 讀取週計畫看盤
         try:
